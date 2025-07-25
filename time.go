@@ -1,25 +1,19 @@
-package fuseps
+package time_wrapper
 
 import (
 	"time"
-
-	"github.com/goccy/go-json"
 )
 
-var raw struct {
-	Date string `json:"__datetime"`
-}
+const customLayout = "20060102T150405"
 
 type TimeWrapper struct {
 	time.Time
 }
 
 func (tw *TimeWrapper) UnmarshalJSON(data []byte) error {
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return err
-	}
+	date := BytesToString(data)
 
-	t, err := time.Parse("20060102T150405", raw.Date)
+	t, err := time.Parse(customLayout, date)
 	if err != nil {
 		return err
 	}
@@ -30,7 +24,5 @@ func (tw *TimeWrapper) UnmarshalJSON(data []byte) error {
 }
 
 func (tw TimeWrapper) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]string{
-		"__datetime": tw.Time.Format("20060102T150405"),
-	})
+	return StringToBytes(tw.Time.Format(customLayout)), nil
 }
