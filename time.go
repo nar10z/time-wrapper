@@ -13,6 +13,12 @@ type TimeWrapper struct {
 }
 
 func (tw *TimeWrapper) UnmarshalJSON(data []byte) error {
+	// Обработка null
+	if len(data) == 0 || string(data) == "null" {
+		*tw = TimeWrapper{}
+		return nil
+	}
+
 	var date string
 	if err := json.Unmarshal(data, &date); err != nil {
 		return err
