@@ -14,7 +14,7 @@ type TimeWrapper struct {
 
 func (tw *TimeWrapper) UnmarshalJSON(data []byte) error {
 	// Обработка null
-	if len(data) == 0 || string(data) == "null" {
+	if len(data) == 0 || BytesToString(data) == "null" {
 		*tw = TimeWrapper{}
 		return nil
 	}
@@ -35,6 +35,10 @@ func (tw *TimeWrapper) UnmarshalJSON(data []byte) error {
 }
 
 func (tw TimeWrapper) MarshalJSON() ([]byte, error) {
+	if tw.Time.IsZero() {
+		return StringToBytes("null"), nil
+	}
+
 	formatted := tw.Format(customLayout)
 	return json.Marshal(formatted)
 }
